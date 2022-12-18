@@ -19,6 +19,7 @@ async function start() {
     app.use(express.json());
     app.use(cors());
     app.use(session());
+    app.use('/image', express.static('image'))
 
     app.get('/', (req, res) => {
         res.json({message: 'Rest service operational!'});

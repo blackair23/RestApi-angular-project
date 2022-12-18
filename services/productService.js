@@ -9,13 +9,24 @@ async function getByUserId(userId) {
 }
 
 async function getById(id) {
-    return Listing.findById(id);
+    return Listing.findById(id).populate('_ownerId');
 } 
 
 async function createProduct(listing) {
+    console.log('createProduce >>>', listing);
     return Listing.create(listing);
+    
 }
-
+// title: ,
+//     location:  ,
+//     price: 1,
+//     description:  , 
+//     imgFile:  ,
+//     service1: ,
+//     service2: ,
+//     service3: ,
+//     service4: ,
+//     _ownerId:
 async function editProduct(id, listing) {
     
     const existing = await getById(id);

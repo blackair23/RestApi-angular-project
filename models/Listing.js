@@ -5,7 +5,7 @@ const listingSchema = new Schema({
     location: { type: String, required: true, minlength: [3, 'Location should be at least 3 charakters long']},
     price: { type: Number, required: true, min: [0.01, 'Price must be a positive number']},
     description: { type: String, required: true, minlength: [10, 'Description should be at least 10 charakters long']},
-    imgFile: { type: String, required: [true, 'Image URL is required!']},
+    imgFile: { type: String, required: [true, 'Image is required!']},
     service1: { type: String},
     service2: { type: String},
     service3: { type: String},

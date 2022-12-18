@@ -1,4 +1,5 @@
-const { register, login, logout } = require('../services/userService');
+const { register, login, logout, getProfileInfo } = require('../services/userService');
+const { getByUserId } = require("../services/productService");
 const { body, validationResult } = require('express-validator');
 const parseError = require('../util/parser');
 
@@ -27,14 +28,47 @@ authController.post('/login', async(req, res) => {
     try {
         const token = await login(req.body.email, req.body.password);
         res.json(token);
+        // console.log('login token >', token);
     } catch (err) {
         const message = parseError(err);
         res.status(401).json({ message })
     }
 }) 
 
+authController.get('/profile/:id', async(req, res) => {
+    // console.log('-----------------------',req.user, '-----------------------');
+
+    try {
+        const user = await getProfileInfo(req.user._id);
+        // const user = await getProfileInfo(tokenId._id)
+        res.json(user)
+    } catch (err) {
+        const message = parseError(err);
+        res.status(401).json({ message })
+        // alert(json({ message }));
+    }
+})
+
+authController.get('/profileList/:id', async(req, res) => {
+    // console.log('-----------------------',req.user, '-----------------------');
+
+    try {
+        const listing = await getByUserId(req.user._id);
+        // const user = await getProfileInfo(tokenId._id)
+        res.json(listing)
+    } catch (err) {
+        const message = parseError(err);
+        res.status(401).json({ message })
+        // alert(json({ message }));
+    }
+})
+
+
 authController.get('/logout', async(req, res) => {
     const token = req.token;
+
+    // console.log('-->-- ',req);
+    // console.log('--<|>-- ',JSON.parse(sessionStorage.getItem('userData')));
     await logout(token);
     res.status(204).end();
 })

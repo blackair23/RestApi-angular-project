@@ -2,7 +2,7 @@ const catalogController = require("express").Router();
 const { hasUser } = require("../middlewares/guards");
 const { getAll, createProduct, getById, editProduct, deleteProduct, getByUserId } = require("../services/productService");
 const parseError = require("../util/parser");
-
+const storage = require("../middlewares/storage");
 
 catalogController.get('/', async (req, res) => {
     let products = [];
@@ -17,14 +17,17 @@ catalogController.get('/', async (req, res) => {
     res.json(products);
 })
 
-catalogController.post('/', hasUser(), async (req, res) => {
+catalogController.post('/', hasUser(), storage,  async (req, res) => {
     try {
-        const data = Object.assign({ _ownerId: req.user._id}, req.body );
-        // console.log(data, '\n And the old data \n', req.body);
+        // console.log(req.user._id,  '\n ID And req.body \n', req.body, '\n here ? \n ', req.body.imgFile);
+        const data = Object.assign({ _ownerId: req.user._id, imgFile: `http://localhost:3030/image/${req.file.filename}`}, req.body );
+        console.log({data}, '\n And the old data \n', req.body);
         let product = await createProduct(data);
+        console.log(product);
         res.json(product);
     } catch (error) {
         let message = parseError(error);
+        console.log(message);
         res.status(400).json({ message })
     }
 })
@@ -34,24 +37,30 @@ catalogController.get('/:id', async (req, res) => {
     res.json(product);
 })
 
-catalogController.put('/:id', hasUser(), async (req, res) => {
+catalogController.put('/:id', hasUser(), storage, async (req, res) => {
     let product = await getById(req.params.id);
-    if(req.user._id != product._ownerId){
+    if(req.user._id != product._ownerId._id){
+        console.log(req.user._id, '  ==  ',product._ownerId._id)
         return res.status(403).json({ message: 'You cannot modify this record' });
     }
     
     try{
-        const result = await editProduct(req.params.id, req.body);
+        const data = Object.assign({ imgFile: `http://localhost:3030/image/${req.file.filename}`}, req.body );
+        console.log('what we have here >',data);
+        const result = await editProduct(req.params.id, data);
         res.json(result);
     } catch (error) {
         let message = parseError(error);
+        console.log(message);
         res.status(400).json({ message })
     }
 })
 
 catalogController.delete('/:id', hasUser(), async(req, res) => {
     let product = await getById(req.params.id);
-    if(req.user._id != product._ownerId){
+
+    if(req.user._id != product._ownerId._id){
+        console.log(req.user._id, '  ? = ?  ',  product._ownerId._id)
         return res.status(403).json({ message: 'You cannot modify this record' });
     }
     try{

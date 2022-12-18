@@ -40,8 +40,26 @@ async function login(email, password) {
     return createToken(user);
 }
 
+
+
 async function logout(token) {
     tokenBlacklist.add(token);
+
+}
+
+async function getProfileInfo(_id) {
+    // const { _id: userId } = req.user;
+
+    const user = await User.findById({ _id }) //finding by Id and returning without password and __v
+    // console.log('get profile user',user);
+    if(!user) {
+        throw new Error('Unauthorised');
+    }
+    return userData = {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+    };
 
 }
 
@@ -54,6 +72,7 @@ async function createToken(user) {
 
     return {
         _id: user._id,
+        username: user.username,
         email: user.email,
         accessToken: jwt.sign(payload, SECRET),
     }
@@ -75,5 +94,6 @@ module.exports = {
     register,
     login,
     logout,
-    parseToken
+    parseToken,
+    getProfileInfo,
 }
